@@ -1,0 +1,18 @@
+services:
+  wifi-sentinel:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      WIFI_ADMIN_PASS: ${WIFI_ADMIN_PASS:-change-me}
+      WIFI_ANALYST_PASS: ${WIFI_ANALYST_PASS:-change-me}
+      WIFI_VIEWER_PASS: ${WIFI_VIEWER_PASS:-change-me}
+      WIFI_SENTINEL_API_KEY: ${WIFI_SENTINEL_API_KEY:-change-this-api-key}
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
+      TELEGRAM_CHAT_ID: ${TELEGRAM_CHAT_ID:-}
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+      ALERT_TO: ${ALERT_TO:-}
+      SMTP_TLS: ${SMTP_TLS:-1}

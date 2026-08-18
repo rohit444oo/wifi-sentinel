@@ -1,0 +1,24 @@
+<!doctype html>
+<html><head><title>Wireless Security Posture</title><link rel="stylesheet" href="/static/style.css"></head>
+<body><div class="shell"><aside class="sidebar"><div class="brand"><div class="brand-icon">🛡</div><div><strong>Wi-Fi Sentinel</strong><span>Wireless Security Operations</span></div></div><nav class="side-nav"><a href="/">⌂ Overview</a><a href="/history">◷ Assessment History</a><a href="/alerts">! Security Events</a><a href="/incidents">◇ Security Incidents</a><a href="/posture">◉ Security Posture</a></nav></aside><main class="main"><div class="app-shell">
+<header><h1>🛡️ Wireless Security Posture</h1><nav><a href="/">Dashboard</a><a href="/incidents">Security Incidents</a><a href="/alerts">Security Events</a></nav></header>
+<main>
+<section class="cards">
+<div class="card"><span>Overall Score</span><strong>{{ posture.score ~ "/100" if posture.total else "—" }}</strong></div>
+<div class="card"><span>Observed APs</span><strong>{{posture.total}}</strong></div>
+</section>
+<section class="panel"><h2>Security Configuration</h2>{% if not posture.total %}<div class="empty-box"><b>No assessment data yet</b><span>Run a wireless assessment to establish the current security posture.</span></div>{% endif %}
+<div class="table-wrap"><table><tr><th>Security</th><th>Count</th><th>Security policy</th></tr>
+{% for k,v in posture.counts.items() %}<tr><td>{{k}}</td><td>{{v}}</td><td>{{"Preferred" if k=="WPA3" else ("Allowed" if k=="WPA2" else ("Legacy" if k=="WPA" else ("Prohibited" if k in ["OPEN","WEP"] else "Needs verification")))}}</td></tr>{% endfor %}
+</table></div></section>
+<section class="panel"><h2>Detection states</h2>
+<div class="table-wrap"><table>
+<tr><th>Status</th><th>Meaning</th></tr>
+<tr><td>Authorized APs</td><td>Exact BSSID matches approved inventory.</td></tr>
+<tr><td>Unapproved</td><td>Observed AP is not in the approved inventory; not proof of malicious activity.</td></tr>
+<tr><td>Suspicious</td><td>Identity differs while the SSID matches an approved network.</td></tr>
+<tr><td>Suspected Rogue Access Point</td><td>Multiple independent fingerprint/behavior indicators are suspicious.</td></tr>
+<tr><td>Security policy Violation</td><td>Wireless configuration violates the defined security policy.</td></tr>
+</table></div></section>
+<section class="panel"><h2>Security policy</h2><ul><li>WPA3 is preferred.</li><li>WPA2 is allowed.</li><li>WEP and OPEN are prohibited by default.</li><li>UNKNOWN requires verification.</li></ul></section>
+</main><div class="footer">Wi-Fi Sentinel · Defensive wireless monitoring · authorized networks only</div></div></main></div><a href="/soc" style="display:none">SOC</a></body></html>

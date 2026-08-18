@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Wi-Fi Sentinel — SOC</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<style>
+:root{--bg:#07090d;--panel:#0d1118;--panel2:#11161e;--line:#202733;--text:#edf2f7;--muted:#8590a1;--accent:#78a7ff;--good:#52e39a;--warn:#f3c95f;--bad:#ff6b78}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.shell{display:grid;grid-template-columns:250px 1fr;min-height:100vh}.side{border-right:1px solid var(--line);background:#090c11;padding:22px 14px;position:sticky;top:0;height:100vh}
+.brand{font-size:18px;font-weight:760;padding:8px 10px 24px}.brand small{display:block;color:var(--muted);font-size:11px;font-weight:500;margin-top:4px}
+.nav-title{color:#596474;font-size:10px;text-transform:uppercase;letter-spacing:.12em;padding:16px 10px 7px}.nav a{display:flex;align-items:center;gap:10px;padding:10px 11px;border-radius:10px;color:#aeb8c7;text-decoration:none;font-size:13px;margin:2px 0}.nav a:hover,.nav a.active{background:#151b24;color:#fff}.icon{width:20px;text-align:center;color:#8ea7cc}
+.main{padding:28px 32px;max-width:1600px;width:100%}.top{display:flex;align-items:center;justify-content:space-between;margin-bottom:26px}.eyebrow{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:#718096}.title{font-size:30px;font-weight:760;letter-spacing:-.7px;margin-top:5px}.sub{color:var(--muted);font-size:13px;margin-top:5px}.live{display:flex;align-items:center;gap:8px;color:#9bf2c2;font-size:12px}.dot{width:8px;height:8px;border-radius:50%;background:var(--good);box-shadow:0 0 14px rgba(82,227,154,.7)}
+.cards{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}.card{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:0 12px 35px rgba(0,0,0,.18)}.label{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#7e899a}.num{font-size:30px;font-weight:760;margin-top:9px}.hint{font-size:11px;color:#667181;margin-top:5px}.riskbar{height:7px;background:#202630;border-radius:99px;overflow:hidden;margin-top:13px}.riskfill{height:100%;width:0;background:linear-gradient(90deg,var(--good),var(--warn),var(--bad));transition:width .3s}
+.row{display:grid;grid-template-columns:1.35fr .65fr;gap:14px;margin-top:14px}.section-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}.section-title{font-weight:680;font-size:14px}.section-meta{font-size:11px;color:var(--muted)}.events{max-height:360px;overflow:auto}.event{padding:12px 0;border-bottom:1px solid var(--line)}.event:last-child{border-bottom:0}.event strong{font-size:13px}.event p{margin:4px 0 0;color:#a6afbc;font-size:12px;line-height:1.45}.event small{color:#697586;font-size:10px}
+.actions{display:flex;gap:8px;flex-wrap:wrap}.btn{border:1px solid var(--line);background:#151b24;color:#e8edf4;border-radius:9px;padding:8px 11px;text-decoration:none;font-size:12px}.btn.primary{background:#e8edf5;color:#0b0e13;border-color:#e8edf5;font-weight:650}.btn:hover{filter:brightness(1.08)}
+.table-wrap{overflow:auto}.table{width:100%;border-collapse:collapse}.table th,.table td{padding:10px 8px;border-bottom:1px solid var(--line);text-align:left;font-size:12px;white-space:nowrap}.table th{color:#718096;font-weight:600}.muted{color:var(--muted)}
+.timeline{height:150px;display:flex;align-items:end;gap:5px;padding-top:15px}.bar{flex:1;min-width:5px;border-radius:5px 5px 0 0;background:#5e8fdc;opacity:.75}.bar:hover{opacity:1}
+@media(max-width:1050px){.shell{grid-template-columns:72px 1fr}.brand{font-size:0}.brand:before{content:"🛡️";font-size:20px}.brand small,.nav-title,.nav a span{display:none}.nav a{justify-content:center}.cards{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:760px){.main{padding:18px}.cards,.row{grid-template-columns:1fr 1fr}.cards .card:first-child{grid-column:span 2}}
+@media(max-width:520px){.cards,.row{grid-template-columns:1fr}.cards .card:first-child{grid-column:auto}.main{padding:14px}}
+</style>
+</head>
+<body>
+<div class="shell">
+<aside class="side">
+  <div class="brand">🛡️ Wi-Fi Sentinel<small>Wireless Security Operations</small></div>
+  <div class="nav-title">Operations</div>
+  <nav class="nav">
+    <a href="/" ><span class="icon">⌂</span><span>Overview</span></a>
+    <a href="/history"><span class="icon">◷</span><span>Assessment History</span></a>
+    <a href="/alerts"><span class="icon">!</span><span>Security Events</span></a>
+    <a href="/incidents"><span class="icon">◇</span><span>Security Incidents</span></a>
+    <a href="/posture"><span class="icon">◉</span><span>Security Posture</span></a>
+    <a href="/devices"><span class="icon">⌘</span><span>Network Assets</span></a>
+    <a href="/soc" class="active"><span class="icon">◈</span><span>SOC live</span></a>
+  </nav>
+  <div class="nav-title">Reporting</div>
+  <nav class="nav">
+    <a href="/export.csv"><span class="icon">↓</span><span>Export Assessment Data</span></a>
+    <a href="/report.pdf"><span class="icon">▤</span><span>Assessment Report</span></a>
+    <a href="/login"><span class="icon">⚙</span><span>Access controls</span></a>
+  </nav>
+</aside>
+
+<main class="main">
+<div id="v22-monitor-toggle" style="margin:0 0 14px 0;padding:12px 14px;border:1px solid #202733;border-radius:12px;background:#0d1118;display:flex;align-items:center;justify-content:space-between;gap:12px">
+  <div>
+    <div style="font-size:12px;font-weight:650">Passive monitoring</div>
+    <div id="v22-monitor-text" style="font-size:11px;color:#8590a1;margin-top:3px">Sensor Operational · monitoring standby</div>
+  </div>
+  <button id="v22-monitor-btn" class="btn primary" type="button">Start monitoring</button>
+</div>
+<script>
+(async function(){
+  const btn=document.getElementById('v22-monitor-btn');
+  const text=document.getElementById('v22-monitor-text');
+  async function state(){
+    try{
+      const r=await fetch('/api/monitoring',{cache:'no-store'});
+      if(!r.ok) return;
+      const d=await r.json();
+      const on=!!d.monitoring;
+      text.textContent=on?'Sensor Operational · passive monitoring active':'Sensor Operational · monitoring standby';
+      btn.textContent=on?'Stop monitoring':'Start monitoring';
+    }catch(_){}
+  }
+  btn.addEventListener('click',async()=>{
+    btn.disabled=true;
+    try{
+      await fetch('/api/monitoring',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({enabled:btn.textContent!=='Stop monitoring'})
+      });
+    }finally{
+      btn.disabled=false;
+      state();
+    }
+  });
+  state();
+})();
+</script>
+
+  <header class="top">
+    <div><div class="eyebrow">Wireless Security / Command center</div><div class="title">Security Operations</div><div class="sub">Live wireless posture, events, risk and device activity.</div></div>
+    <div class="live" id="sentinel-v21-live-badge"><span class="dot"></span> LIVE MONITORING</div>
+  </header>
+
+  <section class="cards">
+    <div class="card"><div class="label">Risk score</div><div class="num" id="risk">0/100</div><div class="riskbar"><div class="riskfill" id="riskFill"></div></div></div>
+    <div class="card"><div class="label">Access Points</div><div class="num" id="aps">0</div><div class="hint">Latest environment</div></div>
+    <div class="card"><div class="label">Authorized Access Points</div><div class="num" id="trusted">0</div><div class="hint">Approved baseline</div></div>
+    <div class="card"><div class="label">Unverified Access Points</div><div class="num" id="untrusted">0</div><div class="hint">Require verification</div></div>
+    <div class="card"><div class="label">Network Assets</div><div class="num" id="devices">0</div><div class="hint">Recently observed</div></div>
+  </section>
+
+  <section class="row">
+    <div class="card">
+      <div class="section-head"><div><div class="section-title">Live security events</div><div class="section-meta">Updated automatically</div></div><a class="btn" href="/alerts">View All Events</a></div>
+      <div class="events" id="events"><div class="muted">Waiting for telemetry…</div></div>
+    </div>
+    <div class="card">
+      <div class="section-head"><div><div class="section-title">Risk Activity</div><div class="section-meta">Recent scans</div></div><a class="btn primary" href="/">Initiate Assessment</a></div>
+      <div class="timeline" id="timeline"></div>
+      <div class="actions" style="margin-top:16px">
+        <a class="btn" href="/incidents">Investigate incidents</a>
+        <a class="btn" href="/posture">Open posture</a>
+        <a class="btn" href="/devices">Network Assets</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="card" style="margin-top:14px">
+    <div class="section-head"><div><div class="section-title">Recent scans</div><div class="section-meta">Security activity history</div></div><a class="btn" href="/history">Full history</a></div>
+    <div class="table-wrap"><table class="table"><thead><tr><th>Scan</th><th>Time</th><th>Risk</th></tr></thead><tbody id="scanRows"><tr><td colspan="3" class="muted">No scans yet.</td></tr></tbody></table></div>
+  </section>
+</main>
+</div>
+
+<script>
+const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+async function refresh(){
+  try{
+    const r=await fetch('/api/soc/v20',{cache:'no-store'});
+    if(!r.ok)return;
+    const d=await r.json();
+    const risk=Number(d.risk||0);
+    document.getElementById('risk').textContent=risk+'/100';
+    document.getElementById('riskFill').style.width=Math.min(100,risk)+'%';
+    document.getElementById('aps').textContent=d.aps??0;
+    document.getElementById('trusted').textContent=d.trusted??0;
+    document.getElementById('untrusted').textContent=d.untrusted??0;
+    document.getElementById('devices').textContent=d.devices??0;
+
+    document.getElementById('events').innerHTML=(d.alerts||[]).slice(0,10).map(a=>
+      `<div class="event"><strong>${esc(a.title||'Security event')}</strong><p>${esc(a.message||'')}</p><small>${esc(a.severity||'')} · ${esc(a.created_at||'')}</small></div>`
+    ).join('')||'<div class="muted">No recent alerts.</div>';
+
+    document.getElementById('scanRows').innerHTML=(d.scans||[]).slice(0,10).map(s=>
+      `<tr><td>#${esc(s.id)}</td><td>${esc(s.created_at)}</td><td>${esc(s.risk)}/100</td></tr>`
+    ).join('')||'<tr><td colspan="3" class="muted">No scans yet.</td></tr>';
+
+    const vals=(d.scans||[]).slice(0,20).reverse().map(s=>Number(s.risk||0));
+    document.getElementById('timeline').innerHTML=vals.map(v=>`<div class="bar" title="${v}/100" style="height:${Math.max(6,v)}%"></div>`).join('')||'<div class="muted">Initiate Assessments to build risk history.</div>';
+  }catch(e){}
+}
+refresh();setInterval(refresh,5000);
+</script>
+
+<script>
+/* v21: lightweight health/telemetry check. Failure is intentionally silent. */
+(async function sentinelV21Health(){
+  try {
+    const r = await fetch('/api/health', {cache:'no-store'});
+    const d = await r.json();
+    const el = document.getElementById('sentinel-v21-live-badge');
+    if (el && d.status !== 'ok') el.innerHTML = '<span class="dot"></span> DEGRADED';
+  } catch (_) {}
+})();
+</script>
+
+</body>
+</html>
