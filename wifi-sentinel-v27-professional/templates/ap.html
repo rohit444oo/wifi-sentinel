@@ -1,1 +1,169 @@
-<!doctype html><html><head><title>AP Details</title><link rel="stylesheet" href="/static/style.css"></head><body><div class="shell"><aside class="sidebar"><div class="brand"><div class="brand-icon">🛡</div><div><strong>Wi-Fi Sentinel</strong><span>Wireless Security Operations</span></div></div><nav class="side-nav"><a href="/">⌂ Overview</a><a href="/history">◷ Assessment History</a><a href="/alerts">! Security Events</a><a href="/incidents">◇ Security Incidents</a><a href="/posture">◉ Security Posture</a></nav></aside><main class="main"><div class="app-shell"><header><h1>🔎 AP Details</h1><nav><a href="/">Dashboard</a></nav></header><main><section class="panel">{% if rows %}<h2>{{rows[0].ssid}}</h2><p><code>{{rows[0].bssid}}</code> • {{rows[0].vendor}}</p><div class="cards"><div><small>Security</small><b>{{rows[0].security}}</b></div><div><small>Current Risk</small><b>{{rows[0].risk}}/100</b></div><div><small>Status</small><b>{{rows[0].status}}</b></div><div><small>Baseline</small><b>{{'Present' if base else 'New'}}</b></div></div><h3>Observation history</h3><div class="table-wrap"><table><tr><th>Time</th><th>Signal</th><th>Channel</th><th>Risk</th><th>Changes</th><th>Reason</th></tr>{% for r in rows %}<tr><td>{{r.observed_at}}</td><td>{{r.signal}}</td><td>{{r.channel}}</td><td>{{r.risk}}</td><td>{{r.changed or '—'}}</td><td>{{r.reason}}</td></tr>{% endfor %}</table></div>{% else %}<p>No observations found.</p>{% endif %}</section></main><div class="footer">Wi-Fi Sentinel · Defensive wireless monitoring · authorized networks only</div></div></main></div><a href="/soc" style="display:none">SOC</a></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>{{profile.ssid}} · Investigation · Wi-Fi Sentinel</title>
+  <link rel="stylesheet" href="{{url_for('static',filename='style.css')}}">
+</head>
+<body class="investigation-page">
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-icon">🛡</div>
+      <div><strong>Wi-Fi Sentinel</strong><span>Wireless Security Operations</span></div>
+    </div>
+    <div class="side-label">Operations</div>
+    <nav class="side-nav">
+      <a href="/">⌂ Overview</a>
+      <a class="active" href="/access-points">⌁ Access Points</a>
+      <a href="/history">◷ Assessment History</a>
+      <a href="/alerts">! Security Events</a>
+      <a href="/incidents">◇ Security Incidents</a>
+      <a href="/posture">◉ Security Posture</a>
+    </nav>
+    <div class="side-label">Reporting</div>
+    <nav class="side-nav">
+      <a href="/export.csv">↓ Export Assessment Data</a>
+      <a href="/report.pdf">▤ Executive Assessment Report</a>
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="sensor-card"><span class="sensor-dot"></span><div><b>Sensor Operational</b><small>Passive wireless discovery</small></div></div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div>
+        <div class="crumb"><a href="/access-points">Access Points</a><span>/</span><b>Investigation</b></div>
+        <h1>{{profile.ssid}}</h1>
+        <p class="page-subtitle mono">{{profile.bssid}} <span>·</span> {{profile.vendor}}</p>
+      </div>
+      <div class="top-actions">
+        <a class="ghost-btn" href="/access-points">← AP Inventory</a>
+      </div>
+    </header>
+
+    <section class="invest-command">
+      <div class="invest-command-main">
+        <div class="invest-kicker"><span class="live-dot"></span> Wireless Asset Investigation</div>
+        <div class="invest-title-row">
+          <h2>{{profile.ssid}}</h2>
+          <span class="status {{profile.level|lower}}"><i></i>{{profile.status}}</span>
+        </div>
+        <div class="invest-meta">
+          <span class="mono">{{profile.bssid}}</span>
+          <span>{{profile.vendor}}</span>
+          <span>Observed {{profile.seen_count}} time{{'' if profile.seen_count == 1 else 's'}}</span>
+        </div>
+      </div>
+      <div class="invest-summary">
+        <div class="summary-risk"><span>Risk</span><strong>{{profile.risk}}</strong><small>/100</small></div>
+        <div><span>Confidence</span><strong>{{profile.confidence}}%</strong></div>
+        <div><span>Trust</span><strong>{{profile.trust}}</strong></div>
+      </div>
+    </section>
+
+    <section class="invest-grid-top">
+      <article class="panel invest-card">
+        <div class="section-head"><div><h3>Risk Analysis</h3><p>Evidence-weighted risk across six assessment dimensions.</p></div><span class="micro-label">ASSESSMENT</span></div>
+        <div class="risk-factors">
+          {% for k,v in profile.risk_breakdown.items() %}
+          <div class="risk-factor">
+            <div><span>{{k}}</span><b>{{v}}</b></div>
+            <div class="factor-bar"><i style="width:{{[v,100]|min}}%"></i></div>
+          </div>
+          {% endfor %}
+        </div>
+        <div class="basis-box"><span>Assessment basis</span><b>{{rows[0].reason if rows else 'No supporting evidence is available for this assessment.'}}</b></div>
+      </article>
+
+      <article class="panel invest-card">
+        <div class="section-head"><div><h3>Wireless Profile</h3><p>Observed RF and security characteristics.</p></div><span class="micro-label">LIVE OBSERVATION</span></div>
+        <div class="profile-metrics">
+          <div class="profile-metric"><span>Authentication</span><b>{{profile.security}}</b></div>
+          <div class="profile-metric"><span>RF Channel</span><b>{{profile.channel or '—'}}</b></div>
+          <div class="profile-metric"><span>Signal Strength</span><b>{{profile.signal}}</b></div>
+          <div class="profile-metric"><span>Profile Consistency</span><b>{{profile.fingerprint}}%</b></div>
+          <div class="profile-metric"><span>Behavioral Anomaly</span><b>{{profile.anomaly}}%</b></div>
+          <div class="profile-metric"><span>SSID Impersonation</span><b>{{'Detected' if profile.spoof else 'Not detected'}}</b></div>
+        </div>
+      </article>
+    </section>
+
+    <section class="panel timeline-panel">
+      <div class="section-head"><div><h3>Observation History</h3><p>Changes observed for this BSSID over time.</p></div><span class="count-chip">{{profile.seen_count}} observation{{'' if profile.seen_count == 1 else 's'}}</span></div>
+      <div class="table-wrap">
+        <table class="invest-table">
+          <thead><tr><th>Observed</th><th>Signal</th><th>RF Channel</th><th>Security</th><th>Risk</th><th>Change</th></tr></thead>
+          <tbody>
+          {% for r in rows %}
+          <tr><td class="mono">{{r.observed_at}}</td><td>{{r.signal}}</td><td>{{r.channel or '—'}}</td><td><span class="security-pill">{{r.security}}</span></td><td><b>{{r.risk}}</b></td><td>{{r.changed or 'No material change'}}</td></tr>
+          {% else %}<tr><td colspan="6" class="empty-row">No historical observations available.</td></tr>{% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="invest-grid-middle">
+      <article class="panel invest-card decision-card">
+        <div class="section-head"><div><h3>Detection Decision</h3><p>How the assessment reached its current classification.</p></div><strong class="confidence-chip">{{profile.confidence}}% confidence</strong></div>
+        <div class="decision-chain compact-chain">
+          {% for name,value,flag in profile.decision_indicators %}
+          <div class="decision-step">
+            <div class="decision-index">{{loop.index}}</div>
+            <div class="decision-copy"><b>{{name}}</b><span>{{value}}</span></div>
+            <em class="{{'decision-alert' if flag else 'decision-ok'}}">{{'INDICATOR' if flag else 'CLEAR'}}</em>
+          </div>
+          {% endfor %}
+        </div>
+        <div class="final-assessment"><span>Final assessment</span><b>{{profile.status}}</b><strong>{{profile.risk}}/100 risk</strong><strong>{{profile.confidence}}% confidence</strong></div>
+      </article>
+
+      <article class="panel invest-card evidence-card">
+        <div class="section-head"><div><h3>Detection Evidence</h3><p>Observed signals supporting the assessment.</p></div><span class="micro-label">TRACEABLE</span></div>
+        <ul class="evidence-list">
+          {% for r in (rows[0].reason.split(';') if rows and rows[0].reason else []) %}
+          <li><span>✓</span><b>{{r.strip()}}</b></li>
+          {% else %}<li><span>✓</span><b>No material detection indicators.</b></li>{% endfor %}
+        </ul>
+        <div class="evidence-stats">
+          <div><span>Authorization</span><b>{{'Authorized' if approved else 'Unverified'}}</b></div>
+          <div><span>SSID Impersonation</span><b>{{'Detected' if profile.spoof else 'Not detected'}}</b></div>
+          <div><span>Behavioral Deviation</span><b>{{profile.anomaly}}%</b></div>
+          <div><span>Profile Consistency</span><b>{{profile.fingerprint}}%</b></div>
+        </div>
+      </article>
+    </section>
+
+    <section class="panel client-panel">
+      <div class="section-head"><div><h3>Client Visibility</h3><p>Network-level client telemetry visible from the current sensor.</p></div><span class="count-chip">{{profile.client_count}} visible</span></div>
+      {% if profile.client_assets %}
+      <div class="table-wrap"><table class="invest-table"><thead><tr><th>Hostname</th><th>IP Address</th><th>MAC Address</th><th>Hardware Vendor</th><th>Last Observed</th></tr></thead><tbody>
+      {% for d in profile.client_assets %}<tr><td><b>{{d.hostname or 'Unknown host'}}</b></td><td class="mono">{{d.ip}}</td><td class="mono">{{d.mac or '—'}}</td><td>{{d.vendor or 'Unknown vendor'}}</td><td class="mono">{{d.last_seen}}</td></tr>{% endfor %}
+      </tbody></table></div>
+      {% else %}<div class="empty-box compact-empty">No LAN-visible client telemetry is currently available.</div>{% endif %}
+      <div class="telemetry-note"><span>i</span><div><b>Telemetry scope</b><p>These are LAN-visible client assets. The current Windows adapter does not provide reliable per-AP association telemetry, so the platform does not claim that these devices are associated with this specific AP.</p></div></div>
+    </section>
+
+    <section class="invest-grid-bottom">
+      <article class="panel invest-card">
+        <div class="section-head"><div><h3>Security Events</h3><p>Events correlated with this BSSID.</p></div></div>
+        {% for a in alerts %}<div class="event-row"><b>{{a.title}}</b><span>{{a.severity}} · {{a.created_at}}</span><p>{{a.message}}</p></div>{% else %}<div class="empty-box compact-empty">No related security events.</div>{% endfor %}
+      </article>
+      <article class="panel invest-card">
+        <div class="section-head"><div><h3>Deployment Context</h3><p>Operational context available to the assessment.</p></div></div>
+        <div class="context-grid">
+          <div><span>Deployment Zone</span><b>{{profile.deployment_zone}}</b></div>
+          <div><span>Client Telemetry</span><b>LAN-visible</b></div>
+          <div><span>AP Association</span><b>Not available</b></div>
+          <div><span>Assessment State</span><b>{{profile.status}}</b></div>
+        </div>
+      </article>
+    </section>
+
+    <footer>Wi-Fi Sentinel · Evidence-based wireless assessment · Validate findings within your authorized environment</footer>
+  </main>
+</div>
+</body>
+</html>

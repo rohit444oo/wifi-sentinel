@@ -3,227 +3,137 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Wi-Fi Sentinel · Security Operations</title>
-<link rel="stylesheet" href="{{url_for('static',filename='style.css')}}">
+<meta name="theme-color" content="#05080d">
+<title>Wi-Fi Sentinel · Security Operations Center</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{url_for('static',filename='style.css')}}?v=40.1">
 </head>
-<body>
+<body class="sentinel-v36">
 <div class="shell">
-
   <aside class="sidebar">
     <div class="brand">
-      <div class="brand-icon">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 4.5 6v5.3c0 4.8 3.1 8.2 7.5 9.7 4.4-1.5 7.5-4.9 7.5-9.7V6L12 3Z"/><path d="m8.8 12 2.1 2.1 4.4-4.4"/></svg>
-      </div>
-      <div><strong>Wi-Fi Sentinel</strong><span>Wireless Security Operations</span></div>
+      <div class="brand-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 4.5 6v5.3c0 4.8 3.1 8.2 7.5 9.7 4.4-1.5 7.5-4.9 7.5-9.7V6L12 3Z"/><path d="m8.8 12 2.1 2.1 4.4-4.4"/></svg></div>
+      <div><strong>Wi-Fi Sentinel</strong><span>Security Operations Center</span></div>
     </div>
-
-    <div class="side-label">Operations</div>
+    <div class="side-label">Workspace</div>
     <nav class="side-nav">
-      <a class="active" href="/"><span class="nav-icon">⌂</span>Overview</a>
-      <a href="/history"><span class="nav-icon">◷</span>Assessment History</a>
-      <a href="/alerts"><span class="nav-icon">!</span>Security Events</a>
-      <a href="/incidents"><span class="nav-icon">◇</span>Security Incidents</a>
-      <a href="/posture"><span class="nav-icon">◉</span>Security Posture</a>
+      <a class="active" href="/"><span class="nav-icon">⌂</span><span>Command Center</span><kbd>01</kbd></a>
+      <a href="/access-points"><span class="nav-icon">⌁</span><span>Asset Intelligence</span></a>
+      <a href="/alerts"><span class="nav-icon">!</span><span>Security Events</span>{% if alerts %}<i class="nav-count">{{alerts|length}}</i>{% endif %}</a>
+      <a href="/incidents"><span class="nav-icon">◇</span><span>Incidents</span></a>
+      <a href="/posture"><span class="nav-icon">◉</span><span>Security Posture</span></a>
     </nav>
-
-    <div class="side-label">Reporting</div>
+    <div class="side-label">Intelligence</div>
     <nav class="side-nav">
-      <a href="/export.csv"><span class="nav-icon">↓</span>Export Assessment Data</a>
-      <a href="/report.pdf"><span class="nav-icon">▤</span>Assessment Report</a>
+      <a href="/history"><span class="nav-icon">◷</span><span>Assessment History</span></a>
+      <a href="/devices"><span class="nav-icon">▦</span><span>Network Assets</span></a>
+      <a href="/discovery"><span class="nav-icon">⌖</span><span>Discovery</span></a>
+      <a href="/executive-report"><span class="nav-icon">▤</span><span>Executive Report</span></a>
     </nav>
-
     <div class="sidebar-bottom">
-      <div class="sensor-card">
-        <span class="sensor-dot"></span>
-        <div><b>Sensor Operational</b><small>Passive Discovery Active</small></div>
-      </div>
-      {% if logged %}
-      <div class="account">
-        <div class="avatar">{{user[:1]|upper}}</div>
-        <div><b>{{user}}</b><small>{{user_role}}</small></div>
-        <a href="/logout" title="Sign out">↗</a>
-      </div>
-      {% else %}
-      <a class="account" href="/login"><div class="avatar">→</div><div><b>Sign in</b><small>Access controls</small></div></a>
-      {% endif %}
+      <div class="sensor-card"><span class="sensor-dot"></span><div><b>Sensor operational</b><small>Passive discovery active</small></div><span class="sensor-live">LIVE</span></div>
+      {% if logged %}<div class="account"><div class="avatar">{{user[:1]|upper}}</div><div><b>{{user}}</b><small>{{user_role}}</small></div><a href="/logout">↗</a></div>{% else %}<a class="account" href="/login"><div class="avatar">→</div><div><b>Sign in</b><small>Access controls</small></div></a>{% endif %}
     </div>
   </aside>
 
   <main class="main">
     <header class="topbar">
-      <div>
-        <div class="crumb">Wireless Security / <b>Overview</b></div>
-        <h1>Security Operations Overview</h1>
-      </div>
+      <div class="top-title"><div class="crumb">SENTINEL / <b>COMMAND CENTER</b></div><h1>Wireless Security Operations</h1></div>
       <div class="top-actions">
-        <div class="monitor-pill"><span id="liveDot"></span><span id="liveText">Monitoring Standby</span></div>
-        <form method="post" action="/scan"><button class="scan-btn" type="submit"><span>＋</span> Initiate Assessment</button></form>
+        <div class="monitor-pill"><span id="liveDot"></span><span id="liveText">Monitoring standby</span><i>LOCAL SENSOR</i></div>
+        <a class="icon-action" href="/alerts" title="Security events">!</a>
+        <form method="post" action="/scan"><button class="scan-btn" type="submit"><span>＋</span> Run assessment</button></form>
       </div>
     </header>
 
-    {% with messages=get_flashed_messages() %}
-      {% if messages %}<div class="flash">{{messages[-1]}}</div>{% endif %}
-    {% endwith %}
+    {% with messages=get_flashed_messages() %}{% if messages %}<div class="flash"><span>✓</span>{{messages[-1]}}</div>{% endif %}{% endwith %}
 
-    <section class="hero-card">
+    <section class="command-hero">
+      <div class="hero-grid-bg"></div>
       <div class="hero-copy">
-        <div class="eyebrow">Wireless Environment</div>
-        <h2>Assess wireless infrastructure with evidence-based security intelligence.</h2>
-        <p>Discover wireless infrastructure, compare it with the authorized baseline, and identify changes that require review.</p>
+        <div class="hero-meta"><span class="status-pip"></span>WIRELESS THREAT SURFACE <b>·</b> LIVE</div>
+        <h2>See the wireless environment.<br><em>Know what changed.</em></h2>
+        <p>Discover access points, compare them against your authorized baseline, correlate security signals, and surface the assets that need investigation.</p>
         <div class="hero-actions">
-          <form method="post" action="/scan"><button class="scan-btn" type="submit">Initiate Wireless Assessment</button></form>
-          <a class="ghost-btn" href="/posture">View Security Posture <span>→</span></a><a class="ghost-btn" href="/devices">Network Assets <span>→</span></a>
+          <form method="post" action="/scan"><button class="primary-hero" type="submit"><span>Run wireless assessment</span><b>⌁</b></button></form>
+          <a class="secondary-hero" href="/posture">Open security posture <span>↗</span></a>
         </div>
+        <div class="hero-proof"><span><b>{{sensor_count}}</b> sensor{% if sensor_count != 1 %}s{% endif %}</span><span><b>{{device_count}}</b> network assets</span><span><b>{{approved|length}}</b> authorized APs</span></div>
       </div>
-      <div class="radar" aria-hidden="true">
-        <div class="radar-ring r1"></div><div class="radar-ring r2"></div><div class="radar-ring r3"></div>
-        <div class="radar-sweep"></div><div class="radar-center"></div>
-        <i class="node n1"></i><i class="node n2"></i><i class="node n3"></i>
+      <div class="network-orbit" aria-hidden="true">
+        <div class="orbit o1"></div><div class="orbit o2"></div><div class="orbit o3"></div>
+        <div class="orbit-line l1"></div><div class="orbit-line l2"></div><div class="orbit-line l3"></div>
+        <div class="core-node"><span></span><small>SENTINEL</small></div>
+        <i class="orbit-node on1"></i><i class="orbit-node on2"></i><i class="orbit-node on3"></i><i class="orbit-node on4"></i>
+        <div class="orbit-label ol1">RF / 2.4G</div><div class="orbit-label ol2">RF / 5G</div><div class="orbit-label ol3">BASELINE</div>
       </div>
+      <div class="hero-corner">WIFI / SECOPS <span>V40.1</span></div>
     </section>
 
-    <section class="kpis">
-      <article class="kpi-card"><div class="kpi-top"><span>Access Points</span><span class="kpi-icon blue">⌁</span></div><strong>{{stats.observations}}</strong><small>Observed in latest scan</small></article>
-      <article class="kpi-card"><div class="kpi-top"><span>Authorized Access Points</span><span class="kpi-icon green">✓</span></div><strong>{{stats.authorized}}</strong><small>Approved by your baseline</small></article>
-      <article class="kpi-card"><div class="kpi-top"><span>Unverified Access Points</span><span class="kpi-icon amber">!</span></div><strong>{{stats.flagged}}</strong><small>Require verification</small></article>
-      <article class="kpi-card"><div class="kpi-top"><span>Network Assets</span><span class="kpi-icon blue">⌁</span></div><strong>{{device_count}}</strong><small>Visible on local network</small></article><article class="kpi-card risk-card"><div class="kpi-top"><span>Maximum Risk</span><span class="kpi-icon red">↗</span></div><strong>{{stats.max_risk}}<em>/100</em></strong><small>Current maximum risk score</small></article>
+    <section class="metric-strip">
+      <a class="metric-card metric-blue" href="/access-points"><div class="metric-head"><span>OBSERVED APs</span><b>↗</b></div><strong>{{stats.observations}}</strong><small>Latest assessment surface</small><div class="metric-spark"><i style="width:72%"></i></div></a>
+      <article class="metric-card metric-green"><div class="metric-head"><span>AUTHORIZED</span><b>✓</b></div><strong>{{stats.authorized}}</strong><small>Matched to baseline</small><div class="metric-spark"><i style="width:{{ 100 if stats.observations and stats.authorized == stats.observations else ((stats.authorized / stats.observations * 100)|round(0)) if stats.observations else 0 }}%"></i></div></article>
+      <article class="metric-card metric-amber"><div class="metric-head"><span>UNVERIFIED</span><b>!</b></div><strong>{{stats.flagged}}</strong><small>Assets requiring review</small><div class="metric-spark"><i style="width:{{ [100,stats.flagged*18]|min }}%"></i></div></article>
+      <article class="metric-card metric-red"><div class="metric-head"><span>CRITICAL / HIGH</span><b>↯</b></div><strong>{{stats.critical + stats.high}}</strong><small>Priority findings</small><div class="severity-mini"><i class="crit" style="width:{{ [100,stats.critical*25]|min }}%"></i><i class="high" style="width:{{ [100,stats.high*25]|min }}%"></i></div></article>
+      <article class="metric-card metric-risk"><div class="metric-head"><span>MAX RISK</span><b>R</b></div><strong>{{stats.max_risk}}<em>/100</em></strong><small>{{ 'Current maximum exposure' if stats.has_scan else 'Awaiting first assessment' }}</small><div class="risk-meter"><i style="width:{{stats.max_risk}}%"></i></div></article>
     </section>
 
-    <section class="content-grid">
-      <div class="left-column">
-        <article class="panel chart-panel">
-          <div class="panel-header">
-            <div><h3>Risk Activity</h3><p>Risk score across recent assessments</p></div>
-            <span class="mini-status">LIVE DATA</span>
-          </div>
-          <div class="chart-wrap"><canvas id="riskChart"></canvas><div id="chartEmpty" class="chart-empty">Complete additional assessments to establish a risk trend.</div></div>
+    <section class="workspace-grid">
+      <div class="workspace-main">
+        <article class="panel intelligence-panel">
+          <div class="panel-header intelligence-head"><div><div class="section-kicker">01 / THREAT INTELLIGENCE</div><h3>Risk activity</h3><p>Maximum risk observed across recent wireless assessments</p></div><div class="live-tag"><span></span> LIVE DATA</div></div>
+          <div class="chart-toolbar"><span>RISK SCORE</span><div><i></i><b>LOW</b><i></i><b>MEDIUM</b><i></i><b>HIGH</b><i></i><b>CRITICAL</b></div></div>
+          <div class="chart-wrap v36-chart"><canvas id="riskChart"></canvas><div id="chartEmpty" class="chart-empty"><span>◌</span><b>No assessment trend yet</b><small>Run additional assessments to establish a risk baseline.</small></div></div>
         </article>
 
-        <article class="panel findings-panel">
-          <div class="panel-header">
-            <div><h3>Security Findings</h3><p>Evidence collected during the latest assessment</p></div>
-            <div class="panel-actions"><input id="ws-v26-filter" class="table-search" type="search" placeholder="Filter access points" aria-label="Filter access points"><a href="/export.csv">CSV</a><a href="/report.pdf">PDF</a></div>
-          </div>
-          <div class="table-wrap">
-            <table>
-              <thead><tr><th>Access point</th><th>Channel</th><th>Signal</th><th>Security</th><th>Status</th><th>Risk</th><th>Trust</th></tr></thead>
-              <tbody>
-              {% for x in observations %}
-                <tr>
-                  <td><a class="ap-name" href="/ap/{{x.bssid}}"><b>{{x.ssid}}</b><small>{{x.bssid}}</small></a></td>
-                  <td><span class="mono">CH {{x.channel or '—'}}</span></td>
-                  <td><div class="signal"><span>{{x.signal}}</span><i><b></b><b></b><b></b><b></b></i></div></td>
-                  <td>{{x.security}}</td>
-                  <td><span class="status {{x.level|lower}}"><i></i>{{x.status}}</span></td>
-                  <td><div class="risk-cell"><b>{{x.risk}}</b><span><i style="width:{{x.risk}}%"></i></span></div></td>
-                  <td><span class="trust">{{x.trust_score}}</span></td>
-                </tr>
-              {% else %}
-                <tr><td colspan="7" class="empty-row">No wireless observations yet. Run a scan to populate the workspace.</td></tr>
-              {% endfor %}
-              </tbody>
-            </table>
-          </div>
+        <article class="panel findings-panel v36-findings">
+          <div class="panel-header"><div><div class="section-kicker">02 / ASSET TRIAGE</div><h3>Wireless asset intelligence</h3><p>Prioritize unverified infrastructure and high-risk observations first.</p></div><div class="panel-actions"><input id="ws-v26-filter" class="table-search" type="search" placeholder="Search SSID / BSSID" aria-label="Search access points"><a class="panel-link-btn" href="/access-points">Full inventory ↗</a></div></div>
+          <div class="table-wrap"><table><thead><tr><th>Asset</th><th>Signal</th><th>Security</th><th>Classification</th><th>Risk</th><th>Trust</th><th></th></tr></thead><tbody>
+          {% for x in observations %}<tr><td><a class="asset-cell" href="/ap/{{x.bssid}}"><span class="asset-mark">⌁</span><span><b>{{x.ssid}}</b><small>{{x.bssid}}</small></span></a></td><td><div class="signal"><span>{{x.signal}}</span><i><b></b><b></b><b></b><b></b></i></div></td><td><span class="security-chip">{{x.security}}</span></td><td><span class="status {{x.level|lower}}"><i></i>{{x.status}}</span></td><td><div class="risk-cell"><b>{{x.risk}}</b><span><i style="width:{{x.risk}}%"></i></span></div></td><td><span class="trust">{{x.trust_score}}</span></td><td><a class="row-arrow" href="/ap/{{x.bssid}}">↗</a></td></tr>
+          {% else %}<tr><td colspan="7" class="empty-row"><div class="empty-state"><span>⌁</span><b>No wireless observations yet</b><small>Run an assessment to populate the security workspace.</small></div></td></tr>{% endfor %}
+          </tbody></table></div>
         </article>
       </div>
 
-      <aside class="right-column">
-        <article class="panel posture-card">
-          <div class="panel-header"><div><h3>Security Posture</h3><p>Current Security Health</p></div></div>
-          <div class="score-ring" style="--score:{{ [100-stats.max_risk,0]|max if stats.has_scan else 0 }}%;">
-            <div><strong>{{ [100-stats.max_risk,0]|max if stats.has_scan else "—" }}</strong><small>{{ "/ 100" if stats.has_scan else "No assessment" }}</small></div>
+      <aside class="workspace-side">
+        <article class="panel posture-panel">
+          <div class="panel-header"><div><div class="section-kicker">03 / SECURITY POSTURE</div><h3>Current posture</h3><p>Baseline health at a glance</p></div><a href="/posture" class="tiny-link">Details ↗</a></div>
+          <div class="posture-visual">
+            <div class="posture-ring" style="--score:{{ [100-stats.max_risk,0]|max if stats.has_scan else 0 }}%"><div><strong>{{ [100-stats.max_risk,0]|max if stats.has_scan else '—' }}</strong><small>/ 100</small></div></div>
+            <div><span class="posture-state-dot"></span><b>{{ 'Requires review' if stats.flagged else ('Healthy baseline' if stats.has_scan else 'Awaiting assessment') }}</b></div>
           </div>
-          <div class="posture-label"><span class="posture-dot"></span> {{ 'Requires Review' if stats.flagged else ('Healthy Baseline' if stats.has_scan else 'Awaiting Assessment') }}</div>
-          <div class="posture-line"><span>Trusted</span><b>{{stats.authorized}}</b></div>
-          <div class="posture-line"><span>Unverified</span><b>{{stats.flagged}}</b></div>
-          <a class="full-btn" href="/posture">Open posture report <span>→</span></a>
+          <div class="posture-stats"><div><span>Authorized</span><b>{{stats.authorized}}</b></div><div><span>Unverified</span><b>{{stats.flagged}}</b></div><div><span>Critical</span><b>{{stats.critical}}</b></div><div><span>High</span><b>{{stats.high}}</b></div></div>
+          <a class="full-btn" href="/posture">Open posture workspace <span>→</span></a>
         </article>
 
-        <article class="panel alerts-panel">
-          <div class="panel-header"><div><h3>Security Findings</h3><p>Recent Security Events</p></div><a class="view-link" href="/alerts">View All Events</a></div>
-          <div class="alert-list">
-          {% for a in alerts[:5] %}
-            <div class="alert-row">
-              <span class="alert-severity {{a.severity|lower}}"></span>
-              <div><b>{{a.title}}</b><p>{{a.message}}</p><small>{{a.created_at}}</small></div>
-            </div>
-          {% else %}
-            <div class="empty-alert">No active security events. The monitored environment is currently quiet.</div>
-          {% endfor %}
-          </div>
+        <article class="panel feed-panel">
+          <div class="panel-header"><div><div class="section-kicker">04 / EVENT STREAM</div><h3>Security events</h3><p>Correlated findings requiring attention</p></div><a href="/alerts" class="tiny-link">View all ↗</a></div>
+          <div class="event-feed">{% for a in alerts[:6] %}<a class="event-item" href="/alerts"><span class="event-dot {{a.severity|lower}}"></span><div><div class="event-top"><b>{{a.title}}</b><em>{{a.severity}}</em></div><p>{{a.message}}</p><small>{{a.created_at}}</small></div></a>{% else %}<div class="event-empty"><span>✓</span><b>Environment quiet</b><small>No active correlated security events.</small></div>{% endfor %}</div>
         </article>
       </aside>
     </section>
 
-    <section class="bottom-grid">
-      <article class="panel inventory-panel">
-        <div class="panel-header"><div><h3>Authorized Access Point Inventory</h3><p>Registered wireless infrastructure</p></div><span class="count-chip">{{approved|length}}</span></div>
-        {% if approved %}
-          <div class="inventory-list">
-          {% for a in approved %}
-            <div class="inventory-row"><div class="inventory-icon">⌁</div><div><b>{{a.ssid}}</b><small>{{a.bssid}} · {{a.security}}</small></div><span class="trusted-badge">Trusted</span></div>
-          {% endfor %}
-          </div>
-        {% else %}
-          <div class="empty-box"><b>Establish an authorized wireless baseline</b><span>Add known access points so Sentinel can distinguish expected infrastructure from new or changed devices.</span></div>
-        {% endif %}
+    <section class="lower-grid">
+      <article class="panel asset-overview">
+        <div class="panel-header"><div><div class="section-kicker">05 / RECENT ACTIVITY</div><h3>Recently observed assets</h3><p>Historical assets outside the current live assessment.</p></div><a href="/access-points" class="tiny-link">Inventory ↗</a></div>
+        <div class="recent-list">{% for x in recent_assets[:6] %}<a href="/ap/{{x.bssid}}" class="recent-row"><span class="recent-icon">⌁</span><span><b>{{x.ssid}}</b><small>{{x.bssid}}</small></span><span class="recent-risk">{{x.risk}}<small>risk</small></span><span class="recent-time">{{x.observed_at or x.assessment_finished_at}}</span><span>↗</span></a>{% else %}<div class="event-empty"><b>No historical assets yet</b><small>Previously observed wireless assets will appear here.</small></div>{% endfor %}</div>
       </article>
-
-      <article class="panel add-panel">
-        <div class="panel-header"><div><h3>Register Authorized Access Point</h3><p>Register approved wireless infrastructure as a baseline reference</p></div></div>
-        <form class="premium-form" method="post" action="/inventory/add">
-          <div class="field"><label>SSID</label><input name="ssid" placeholder="e.g. Office-WiFi" required></div>
-          <div class="field"><label>BSSID</label><input name="bssid" placeholder="AA:BB:CC:DD:EE:FF" required></div>
-          <div class="field"><label>Security</label><select name="security"><option>WPA3</option><option selected>WPA2</option><option>WPA</option><option>WEP</option><option>OPEN</option></select></div>
-          <div class="field"><label>Location / note</label><input name="note" placeholder="Optional"></div>
-          <button class="full-btn" type="submit">Register Access Point <span>→</span></button>
-        </form>
+      <article class="panel baseline-panel">
+        <div class="panel-header"><div><div class="section-kicker">06 / TRUST MODEL</div><h3>Authorized baseline</h3><p>Known-good wireless infrastructure</p></div><span class="count-chip">{{approved|length}} REGISTERED</span></div>
+        {% if approved %}<div class="baseline-list">{% for a in approved[:5] %}<div class="baseline-row"><span class="baseline-icon">✓</span><span><b>{{a.ssid}}</b><small>{{a.bssid}} · {{a.security}}</small></span><em>TRUSTED</em></div>{% endfor %}</div><a class="full-btn" href="/access-points">Manage baseline <span>→</span></a>{% else %}<div class="baseline-empty"><span>+</span><b>No authorized baseline</b><small>Register known access points to improve change detection and trust scoring.</small><a class="full-btn" href="/access-points">Establish baseline <span>→</span></a></div>{% endif %}
       </article>
     </section>
 
-    <footer>Wi-Fi Sentinel · Passive wireless monitoring · Assess only networks you are authorized to monitor</footer>
+    <footer><span>WI-FI SENTINEL</span><i></i> Passive wireless monitoring <i></i> Authorized environments only <b>V40.1</b></footer>
   </main>
 </div>
-
 <script>
-let timer=null;
 const apiKey=localStorage.getItem("wifiSentinelApiKey")||"";
-async function autoScan(){try{const r=await fetch("/api/auto-scan",{method:"POST",headers:{"X-API-Key":apiKey}});if(r.ok)location.reload()}catch(e){}}
-async function drawTimeline(){
-  try{
-    const r=await fetch("/api/timeline",{headers:{"X-API-Key":apiKey}});
-    const rows=await r.json(); const c=document.getElementById("riskChart"); const empty=document.getElementById("chartEmpty");
-    if(!rows.length){empty.style.display="grid";return}
-    empty.style.display="none";
-    const dpr=window.devicePixelRatio||1,w=c.clientWidth,h=c.clientHeight;c.width=w*dpr;c.height=h*dpr;
-    const ctx=c.getContext("2d");ctx.scale(dpr,dpr);ctx.clearRect(0,0,w,h);
-    const pad={l:4,r:4,t:16,b:18},cw=w-pad.l-pad.r,ch=h-pad.t-pad.b;
-    ctx.strokeStyle="rgba(255,255,255,.06)";ctx.lineWidth=1;
-    [0,.25,.5,.75,1].forEach(v=>{let y=pad.t+ch*v;ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(w-pad.r,y);ctx.stroke()});
-    const pts=rows.map((x,i)=>({x:pad.l+(i/Math.max(1,rows.length-1))*cw,y:pad.t+ch*(1-Math.min(100,Math.max(0,x.max_risk))/100)}));
-    const g=ctx.createLinearGradient(0,0,0,h);g.addColorStop(0,"rgba(138,180,248,.20)");g.addColorStop(1,"rgba(138,180,248,0)");
-    ctx.beginPath();pts.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));ctx.lineTo(pts.at(-1).x,pad.t+ch);ctx.lineTo(pts[0].x,pad.t+ch);ctx.closePath();ctx.fillStyle=g;ctx.fill();
-    ctx.beginPath();pts.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));ctx.strokeStyle="#8ab4f8";ctx.lineWidth=2;ctx.stroke();
-    pts.slice(-1).forEach(p=>{ctx.beginPath();ctx.arc(p.x,p.y,4,0,Math.PI*2);ctx.fillStyle="#8ab4f8";ctx.fill();ctx.strokeStyle="#101318";ctx.lineWidth=3;ctx.stroke()});
-  }catch(e){}
-}
+async function drawTimeline(){try{const r=await fetch("/api/timeline",{headers:{"X-API-Key":apiKey}});const rows=await r.json();const c=document.getElementById("riskChart"),empty=document.getElementById("chartEmpty");if(!rows.length){empty.style.display="grid";return}empty.style.display="none";const dpr=window.devicePixelRatio||1,w=c.clientWidth,h=c.clientHeight;c.width=w*dpr;c.height=h*dpr;const ctx=c.getContext("2d");ctx.scale(dpr,dpr);ctx.clearRect(0,0,w,h);const pad={l:8,r:10,t:12,b:20},cw=w-pad.l-pad.r,ch=h-pad.t-pad.b;ctx.strokeStyle="rgba(151,192,220,.07)";ctx.lineWidth=1;[0,.25,.5,.75,1].forEach(v=>{const y=pad.t+ch*v;ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(w-pad.r,y);ctx.stroke()});const pts=rows.map((x,i)=>({x:pad.l+(i/Math.max(1,rows.length-1))*cw,y:pad.t+ch*(1-Math.min(100,Math.max(0,x.max_risk))/100),risk:x.max_risk}));const g=ctx.createLinearGradient(0,0,0,h);g.addColorStop(0,"rgba(76,205,224,.24)");g.addColorStop(1,"rgba(76,205,224,0)");ctx.beginPath();pts.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));ctx.lineTo(pts.at(-1).x,pad.t+ch);ctx.lineTo(pts[0].x,pad.t+ch);ctx.closePath();ctx.fillStyle=g;ctx.fill();ctx.beginPath();pts.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));ctx.strokeStyle="#5de1ff";ctx.lineWidth=2.2;ctx.stroke();pts.slice(-1).forEach(p=>{ctx.beginPath();ctx.arc(p.x,p.y,4.5,0,Math.PI*2);ctx.fillStyle="#5de1ff";ctx.fill();ctx.strokeStyle="#071018";ctx.lineWidth=3;ctx.stroke()});}catch(e){}}
 drawTimeline();
+const filter=document.getElementById('ws-v26-filter');if(filter){filter.addEventListener('input',e=>{const q=e.target.value.toLowerCase();document.querySelectorAll('.v36-findings tbody tr').forEach(r=>{r.style.display=r.innerText.toLowerCase().includes(q)?'':'none'})})}
 </script>
-
-<script>
-(function(){
-  const input = document.getElementById('ws-v26-filter');
-  if(!input) return;
-  const rows = document.querySelectorAll('.findings-panel tbody tr');
-  input.addEventListener('input', function(){
-    const q = this.value.trim().toLowerCase();
-    rows.forEach(function(row){
-      const text = row.textContent.toLowerCase();
-      row.style.display = !q || text.includes(q) ? '' : 'none';
-    });
-  });
-})();
-</script>
-
 </body>
 </html>

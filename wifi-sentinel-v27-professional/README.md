@@ -233,3 +233,23 @@ A full dark product-style dashboard redesign with sidebar navigation, hero comma
 - SIEM-ready JSON event endpoint at `/siem/events.json`.
 - High/Critical alerts can create evidence-backed incidents.
 - Important: a normal Windows Wi-Fi adapter cannot reliably enumerate every Wi-Fi client in RF range. Full over-the-air client discovery requires a monitor-mode-capable sensor/driver. The Devices page therefore distinguishes LAN-visible devices from nearby APs.
+
+## v30 Professional Access Point Workspace
+- Added a dedicated `/access-points` inventory showing every AP from the latest completed assessment.
+- Made the Overview Access Points KPI directly open the complete AP inventory.
+- Added professional AP search across SSID, BSSID, vendor, status and security.
+- Added assessment confidence as a separate evidence-strength indicator.
+- Fixed AP investigation SSID baseline lookup after database connection closure.
+- Preserved evidence-based classification: an unverified AP is not automatically malicious.
+
+
+## V31.1 UI refinement
+- Added a continuously rotating security posture meter around the score ring.
+- The numeric posture score remains stationary for readability.
+- Reduced-motion accessibility is respected.
+
+
+## v31.5 UI correction
+- Security Findings now provides a direct View all access points action using the complete latest-assessment inventory.
+- Findings table is not vertically truncated.
+- Wireless Environment radar now uses a clearly visible rotating sweep stick with a moving illuminated tip.
